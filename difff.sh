@@ -73,32 +73,38 @@ fi
 declare -r fields="${1:-1}"
 field_separator="${IFS:0:1}"
 declare -r field_separator="${field_separator:- }"
-declare -r line_separator="${IFS: -1}"
 
-similarities="$(comm -12 \
-    <(cut -d "$field_separator" -f "$fields" "$2" | sort -u) \
-    <(cut -d "$field_separator" -f "$fields" "$3" | sort -u))"
+# Field values from both files
+declare -r fields_1="$(mktemp)"
+declare -r fields_2="$(mktemp)"
+cut -d "$field_separator" -f "$fields" -- "$2" >> "$fields_1"
+cut -d "$field_separator" -f "$fields" -- "$3" >> "$fields_2"
 
-diff \
-    <(while IFS= read -r -u 9 line
-    do
-        fields_text="$(cut -d "$field_separator" -f "$fields" <<<"$line")"
-        while IFS= read -r -u 8 similarity
-        do
-            if [[ "$fields_text" = "$similarity" ]]
-            then
-                echo "$line"
-            fi
-        done 8<<<"$similarities"
-    done 9< <(sort "$2")) \
-    <(while IFS= read -r -u 9 line
-    do
-        fields_text="$(cut -d "$field_separator" -f "$fields" <<<"$line")"
-        while IFS= read -r -u 8 similarity
-        do
-            if [[ "$fields_text" = "$similarity" ]]
-            then
-                echo "$line"
-            fi
-        done 8<<<"$similarities"
-    done 9< <(sort "$3"))
+# Get line numbers from each file matching the other's fields
+declare -r lines_1="$(grep -nxFf "$fields_2" "$fields_1" | cut -d ':' -f 1 || true)"
+declare -r lines_2="$(grep -nxFf "$fields_1" "$fields_2" | cut -d ':' -f 1 || true)"
+
+# Don't need this anymore
+rm -- "$fields_1" "$fields_2"
+
+# Get back lines from the original files
+declare -r full_lines_1="$(mktemp)"
+declare -r full_lines_2="$(mktemp)"
+
+for line in $lines_1
+do
+    sed "${line}q;d" -- "$2" >> "$full_lines_1"
+done
+
+for line in $lines_2
+do
+    sed "${line}q;d" -- "$3" >> "$full_lines_2"
+done
+
+sort -o "$full_lines_1" "$full_lines_1"
+sort -o "$full_lines_2" "$full_lines_2"
+
+diff -- "$full_lines_1" "$full_lines_2" || exit_code=$?
+
+rm -- "$full_lines_1" "$full_lines_2"
+exit ${exit_code-0}
