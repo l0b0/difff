@@ -90,9 +90,7 @@ rm -- "$fields_1" "$fields_2"
 # Get back lines from the original files
 declare -r full_lines_1="$(mktemp)"
 declare -r sed_1="$(sed -e 's/\([0-9]\)$/\1p\;/' <<<"$lines_1")"
-echo "SED: $sed_1" >&2
 sed -n "$sed_1" -- "$2" | sort >> "$full_lines_1"
-
 
 declare -r full_lines_2="$(mktemp)"
 declare -r sed_2="$(sed -e 's/\([0-9]\)$/\1p\;/' <<<"$lines_2")"
