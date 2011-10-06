@@ -7,7 +7,6 @@ INSTALL_FILE_PATH = $(PREFIX)/$(basename $(SCRIPT))
 test:
 	$(CURDIR)/test.sh
 
-.PHONY: $(INSTALL_FILE_PATH)
 $(INSTALL_FILE_PATH):
 	cp $(FILE_PATH) $(INSTALL_FILE_PATH)
 
