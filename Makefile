@@ -9,6 +9,7 @@ test:
 
 $(INSTALL_FILE_PATH):
 	cp $(FILE_PATH) $(INSTALL_FILE_PATH)
+	chmod 555 $(INSTALL_FILE_PATH)
 
 .PHONY: install
 install: $(INSTALL_FILE_PATH)
