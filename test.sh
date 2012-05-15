@@ -132,4 +132,4 @@ test_fields_diff() {
 
 # load and run shUnit2
 test -n "${ZSH_VERSION:-}" && SHUNIT_PARENT=$0
-. shunit2
+. /usr/share/shunit2/shunit2
