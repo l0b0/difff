@@ -7,7 +7,7 @@
 #    https://github.com/l0b0/difff/issues
 #
 # COPYRIGHT AND LICENSE
-#    Copyright (C) 2011 Victor Engmark
+#    Copyright (C) 2011-2012 Victor Engmark
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,9 +26,10 @@
 
 declare -r directory=$(dirname $(readlink -f "$0"))
 declare -r cmd="${directory}/difff.sh"
+declare -r test_name=$'--$`!*@\a\b\E\f\r\t\v\\\'"\360\240\202\211 \n'
 
 oneTimeSetUp() {
-    test_dir="$__shunit_tmpDir"/$'--$`\! *@ \a\b\e\E\f\r\t\v\\\"\' \n'
+    test_dir="$__shunit_tmpDir"/"$test_name"
     file1="$test_dir/file1"
     file2="$test_dir/file2"
 }
